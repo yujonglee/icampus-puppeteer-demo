@@ -1,8 +1,14 @@
 const puppeteer = require("puppeteer");
 const {id, password } = require('args-parser')(process.argv);
 
-const baseUrl = "https://canvas.skku.edu/";
+const baseUrl = "https://canvas.skku.edu";
 const firstCardCover = "#DashboardCard_Container > div > div:nth-child(1) > div > div.ic-DashboardCard__header_hero";
+
+const visit = async (browser, url, i) => {
+  const page = await browser.newPage();
+  await page.goto(url);
+  await page.screenshot({ path: `screenshots/${i}.png`});
+}
 
 (async () => {
   const browser = await puppeteer.launch();
@@ -28,7 +34,9 @@ const firstCardCover = "#DashboardCard_Container > div > div:nth-child(1) > div 
     })
   })
 
-  console.log(classes);
+  await Promise.all(
+    classes.map(({ url }, i) => visit(browser, `${baseUrl}${url}/external_tools/5`, i))
+  );
 
   await browser.close();
 })();
